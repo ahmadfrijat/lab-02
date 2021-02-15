@@ -1,77 +1,95 @@
 'use strict';
-var arr=[];
 
-function Dog(image_url, title, description,keyword,horns) {
-  this.image_url = image_url;
-  this.title = title;
-  this.description = description;
-  this.keyword = keyword;
-  this.horns = horns;
-  arr.push(this)
+function Horn(element) {
+    this.image_url = element.image_url;
+    this.title = element.title;
+    this.description = element.description;
+    this.keyword = element.keyword;
+    // console.log(this.keyword);
+    this.horns = element.horns;
+    hornArr.push(this);
+    if (keywordArr.includes(this.keyword) === false) {
+        keywordArr.push(this.keyword);
+    }
+}
+let hornArr = [];
+let keywordArr = [];
+console.log(keywordArr);
+
+Horn.prototype.render = function () {
+
+
+    let sectionClone = $('.photo-template').clone();
+    sectionClone.removeClass('photo-template');
+    sectionClone.find('h2').text(this.title);
+    sectionClone.find('img').attr('src', this.image_url);
+    sectionClone.find('p').text(this.description);
+    $('main').append(sectionClone);
+
+
+}
+function theOption(element) {
+
+    let options = $('<option></option>').text(element);
+    $('select').append(options);
+    
 }
 
-// $('document').ready(function(){
-// $('select').on('click',function(){
-// // $(this).siblings('option')
-// let newSelect=$(this).val()
-// // console.log(newSelect);
-// newSelect.render();
-// })
+
+function selection() {
+    $('select').on('change', function () {
+
+        let selected = $(this).val();
+        console.log(selected);
+        let allselected = hornArr.filter((element) => element.keyword === selected);
+        console.log(allselected);
+        $('section:not(:first)').remove();
+        allselected.forEach(value => {
+            value.render();
+        });
 
 
-// })
 
-
-Dog.prototype.render = function () {
-  var dogSection = $('.dog-template').clone();
-  $('main').append(dogSection);
-  dogSection.find('img').attr('src', this.image_url);
-  dogSection.find('h2').text(this.title);
-  dogSection.find('p').text(this.description);
-  dogSection.removeClass('dog-template');
- 
-};
-
-
-// Dog.prototype.newOption= function() {
-//   let newSelect=$(this).val()
-//   if (newSelect===this.keyword) {
-//     $('section').remove();
-//   }
-// }
-
-
-$('document').ready(function(){
-  $('select').on('change',function(){
-  // $(this).siblings('option')
-  let newSelect=$(this).val()
-  // console.log(newSelect);
-  if (newSelect) {
-    $('section').remove();
-    if (newSelect === this.keyword) {
- 
-    }
-  }
-  })
-  
-  
- })
-function populateDogsData() {
-  const ajaxSettings = {
-    method: 'get',
-    dataType: 'json'
-  };
-
-  $.ajax('page-1.json', ajaxSettings)
-    .then(data => {
-      data.forEach(element => {
-        let jsDog = new Dog(element.image_url, element.title,element.description);
-        jsDog.render();
-      });
     });
 }
 
 
-$('document').ready(populateDogsData);
+// function populateDogsData() {
+//     const ajaxSettings = {
+//       method: 'get',
+//       dataType: 'json'
+//     };
+//     $.ajax('./data/page-1.json', ajaxSettings)
+//       .then(data => {
+//         data.forEach(element => {
+//           let jsDog = new Horn(element)
+//           jsDog.render();
+//         });
+//         keywordArr.forEach(element => {
+//                  theOption(element);
+
+//                     });
+//       });
 
 
+//   }
+//   (() => selection());
+
+//   $('document').ready(populateDogsData);
+
+$.get('./data/page-1.json')
+    .then(data => {
+        //    console.log(data);
+        data.forEach((element) => {
+
+            let newHorn = new Horn(element);
+            newHorn.render();
+
+            //    console.log(element);
+        });
+        keywordArr.forEach(element => {
+            theOption(element);
+        });
+
+    })
+  .then(() => selection());
