@@ -1,4 +1,5 @@
 'use strict';
+var arr=[];
 
 function Dog(image_url, title, description,keyword,horns) {
   this.image_url = image_url;
@@ -6,19 +7,55 @@ function Dog(image_url, title, description,keyword,horns) {
   this.description = description;
   this.keyword = keyword;
   this.horns = horns;
-
+  arr.push(this)
 }
 
+// $('document').ready(function(){
+// $('select').on('click',function(){
+// // $(this).siblings('option')
+// let newSelect=$(this).val()
+// // console.log(newSelect);
+// newSelect.render();
+// })
+
+
+// })
+
+
 Dog.prototype.render = function () {
-  let dogSection = $('.dog-template').clone();
+  var dogSection = $('.dog-template').clone();
   $('main').append(dogSection);
   dogSection.find('img').attr('src', this.image_url);
-
   dogSection.find('h2').text(this.title);
   dogSection.find('p').text(this.description);
   dogSection.removeClass('dog-template');
+ 
 };
 
+
+// Dog.prototype.newOption= function() {
+//   let newSelect=$(this).val()
+//   if (newSelect===this.keyword) {
+//     $('section').remove();
+//   }
+// }
+
+
+$('document').ready(function(){
+  $('select').on('change',function(){
+  // $(this).siblings('option')
+  let newSelect=$(this).val()
+  // console.log(newSelect);
+  if (newSelect) {
+    $('section').remove();
+    if (newSelect === this.keyword) {
+ 
+    }
+  }
+  })
+  
+  
+ })
 function populateDogsData() {
   const ajaxSettings = {
     method: 'get',
