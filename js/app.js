@@ -1,40 +1,73 @@
 'use strict';
 
-function Dog(image_url, title, description,keyword,horns) {
-  this.image_url = image_url;
-  this.title = title;
-  this.description = description;
-  this.keyword = keyword;
-  this.horns = horns;
+$.get('./data/page-1.json')
+    .then(data => {
+        //    console.log(data);
+        data.forEach((element) => {
+
+            let newHorn = new Horn(element);
+            newHorn.render();
+
+            //    console.log(element);
+        });
+        keywordArr.forEach(element => {
+            theOption(element);
+        });
+
+    })
+    .then(() => selection());
+
+
+
+function Horn(element) {
+    this.image_url = element.image_url;
+    this.title = element.title;
+    this.description = element.description;
+    this.keyword = element.keyword;
+    // console.log(this.keyword);
+    this.horns = element.horns;
+    hornArr.push(this);
+    if (keywordArr.includes(this.keyword) === false) {
+        keywordArr.push(this.keyword);
+    }
+}
+let hornArr = [];
+let keywordArr = [];
+console.log(keywordArr);
+
+Horn.prototype.render = function () {
+
+
+    let sectionClone = $('.photo-template').clone();
+    sectionClone.removeClass('photo-template');
+    sectionClone.find('h2').text(this.title);
+    sectionClone.find('img').attr('src', this.image_url);
+    sectionClone.find('p').text(this.description);
+    $('main').append(sectionClone);
+
 
 }
+function theOption(element) {
 
-Dog.prototype.render = function () {
-  let dogSection = $('.dog-template').clone();
-  $('main').append(dogSection);
-  dogSection.find('img').attr('src', this.image_url);
+    let options = $('<option></option>').text(element);
+    $('select').append(options);
+    
+}
 
-  dogSection.find('h2').text(this.title);
-  dogSection.find('p').text(this.description);
-  dogSection.removeClass('dog-template');
-};
 
-function populateDogsData() {
-  const ajaxSettings = {
-    method: 'get',
-    dataType: 'json'
-  };
+function selection() {
+    $('select').on('change', function () {
 
-  $.ajax('page-1.json', ajaxSettings)
-    .then(data => {
-      data.forEach(element => {
-        let jsDog = new Dog(element.image_url, element.title,element.description);
-        jsDog.render();
-      });
+        let selected = $(this).val();
+        console.log(selected);
+        let allselected = hornArr.filter((element) => element.keyword === selected);
+        console.log(allselected);
+        $('section:not(:first)').remove();
+        allselected.forEach(value => {
+            value.render();
+        });
+
+
+
     });
 }
-
-
-$('document').ready(populateDogsData);
-
-
