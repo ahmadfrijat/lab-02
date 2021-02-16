@@ -1,77 +1,145 @@
 'use strict';
-var arr=[];
-
-function Dog(image_url, title, description,keyword,horns) {
-  this.image_url = image_url;
-  this.title = title;
-  this.description = description;
-  this.keyword = keyword;
-  this.horns = horns;
-  arr.push(this)
-}
-
-// $('document').ready(function(){
-// $('select').on('click',function(){
-// // $(this).siblings('option')
-// let newSelect=$(this).val()
-// // console.log(newSelect);
-// newSelect.render();
-// })
+let hornArr = [];
+let keywordArr = [];
 
 
-// })
 
-
-Dog.prototype.render = function () {
-  var dogSection = $('.dog-template').clone();
-  $('main').append(dogSection);
-  dogSection.find('img').attr('src', this.image_url);
-  dogSection.find('h2').text(this.title);
-  dogSection.find('p').text(this.description);
-  dogSection.removeClass('dog-template');
- 
-};
-
-
-// Dog.prototype.newOption= function() {
-//   let newSelect=$(this).val()
-//   if (newSelect===this.keyword) {
-//     $('section').remove();
-//   }
-// }
-
-
-$('document').ready(function(){
-  $('select').on('change',function(){
-  // $(this).siblings('option')
-  let newSelect=$(this).val()
-  // console.log(newSelect);
-  if (newSelect) {
-    $('section').remove();
-    if (newSelect === this.keyword) {
- 
+function Horn(element) {
+    this.image_url = element.image_url;
+    this.title = element.title;
+    this.description = element.description;
+    this.keyword = element.keyword;
+    this.horns = element.horns;
+    hornArr.push(this);
+    if (!keywordArr.includes(this.keyword)) {
+        keywordArr.push(this.keyword);
     }
-  }
-  })
-  
-  
- })
-function populateDogsData() {
-  const ajaxSettings = {
-    method: 'get',
-    dataType: 'json'
-  };
+}
+console.log(keywordArr);
 
-  $.ajax('page-1.json', ajaxSettings)
-    .then(data => {
-      data.forEach(element => {
-        let jsDog = new Dog(element.image_url, element.title,element.description);
-        jsDog.render();
-      });
+Horn.prototype.render = function () {
+    let newDiv = $('#neigh-template').html();
+    let html = Mustache.render(newDiv, this);
+    $('#newtemplate').append(html);
+
+    // if (!keywordArr.includes(this.keyword)) {
+    //     keywordArr.push(this.keyword);
+
+    //     let options = $('#option').html();
+    //     let sndHtml = Mustache.render(options, this);
+    //     $('#selectClone').append(sndHtml);
+    // }
+
+}
+// -------------------------
+// -------------------------
+// -------------------------
+
+
+Keywords.array = [];
+
+function bulder() {
+    keywordArr.forEach(element => {
+        let key = new Keywords(element);
+        Keywords.array.push(key);
+
+    });
+    Keywords.array.forEach(element => {
+        // console.log(element);
+        let options = $('#option').html();
+        let sndHtml = Mustache.render(options, element);
+        $('#selectClone').append(sndHtml);
     });
 }
+function Keywords(element) {
+    this.keyOption = element;
+}
+// ----------------------------------
+// -------------------------
+// -------------------------
 
+function selection() {
+    $('#selectClone').on('change', function () {
+        let selected = $(this).val();
+        // console.log(selected);
+        $('div').hide();
+        if (selected === 'default') {
+            $('div').show();
+            // console.log("kkk");
+        }
+        hornArr.forEach(val => {
+            if (val.keyword === selected) {
+                $(`div[class=${selected}]`).show();
+                // console.log("rrrr");
+            }
+        })
+    })
+}
 
-$('document').ready(populateDogsData);
+function pages() {
 
+    $('button').on('click', function () {
+        let bclass = $(this).attr('class');
+        // console.log(bclass);
+        $('div').remove();
+        // $('#selectClone').empty();
+        hornArr = [];
+        keywordArr = [];
+        Keywords.array = [];
+        // console.log(Keywords.array);
+        renderPages(`./data/${bclass}.json`);
 
+    })
+}
+// ---------------------sort---------------------------
+// --------------------------------------------------
+function sortion() {
+
+    $('.sortBy').on('click', function () {
+        // console.log("jjjj");
+        if ($('.sortBy').val() === 'title') {
+            // console.log("llllllllllllllllllllllllllll");
+            sortAlgorithem(hornArr, 'title');
+        }
+        if ($('.sortBy').val() === 'horns') {
+            sortAlgorithem(hornArr, 'horns');
+        }
+
+    })
+}
+function sortAlgorithem(array, key) {
+    // console.log("mymymymy")
+    array.sort(function (a, b) {
+        // console.log("in sorting");
+        let i = a[key];
+        let j = b[key];
+        if (i < j) return -1;
+        else if (i > j) return 1;
+        else return 0;
+
+    })
+    $('div').remove();
+    hornArr.forEach(val => {
+        val.render();
+    })
+}
+
+pages();
+renderPages('./data/page-1.json');
+function renderPages(dataJSON) {
+    $.get(dataJSON)
+        .then(data => {
+            data.forEach((element) => {
+                let newHorn = new Horn(element);
+                newHorn.render();
+            });
+            bulder();
+
+            selection();
+            sortion();
+            // sortAlgorithem();
+        })
+
+}
+
+console.log(Keywords);
